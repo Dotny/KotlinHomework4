@@ -4,16 +4,16 @@ data class Post(
     val fromId: Int,
     val date: Int,
     val text: String,
-    val friendsOnly: Boolean = false,
     val comments: Comments,
     val likes: Likes,
     val views: Int = 0,
+    val friendsOnly: Boolean = false,
     val canPin: Boolean = false,
     val canDelete: Boolean = false,
     val canEdit: Boolean = false,
     val isPinned: Boolean = false,
     val markedAsAds: Boolean = false,
-    val isFavorite: Boolean = false
+    val isFavorite: Boolean = false,
 )
 
 class Comments(
@@ -34,9 +34,11 @@ class   Likes(
 object WallService {
 
     private var posts = emptyArray<Post>()
+    private var id = 0
 
     fun add(post: Post): Post {
-        posts += post
+        id += 1
+        posts += post.copy(id = id)
         return posts.last()
     }
 
@@ -51,14 +53,19 @@ object WallService {
         }
         return result
     }
+
+    fun clear() {
+        posts = emptyArray()
+        id = 0
+    }
 }
 
 
 fun main() {
     val comments = Comments()
     val likes = Likes()
-    val post1 = Post(1, 2, 2, 2025, "Hello", true, comments, likes)
-    val post2 = Post(11, 2, 2, 2026, "Hello", true, comments, likes)
+    var post1 = Post(1, 2, 3, 2025, "Hello", comments, likes)
+    var post2 = Post(2, 2, 3, 2026, "Hello", comments, likes)
     WallService.add(post1)
     println(WallService.update(post2))
 }
