@@ -32,66 +32,37 @@ class Likes(
     val canPublish: Boolean = true
 )
 
-open class Attachment(
-    val type: String,
-    val id: Int,
-    val ownerId: Int,
+interface Attachment {
+    val type: String
+    val id: Int
+    val ownerId: Int
     val date: Int
-)
+}
 
-class Photo(
-    id: Int,
-    ownerId: Int,
-    date: Int,
-    val album_id: Int,
-    val text: String,
-    val width: Int,
-    val height: Int,
-    type: String = "Photo"
-) : Attachment(type, id, ownerId, date)
+data class Photo(val album_id: Int, val text: String, val width: Int, val height: Int)
+data class PhotoAttachment(override val id: Int, override val ownerId: Int, override val date: Int, val photo: Photo): Attachment{
+    override val type: String = "photo"
+}
 
-class Audio(
-    id: Int,
-    ownerId: Int,
-    date: Int,
-    val artist: String,
-    val text: String,
-    val duration: Int,
-    val albumId: Int,
-    type: String = "Audio"
-) : Attachment(type, id, ownerId, date)
+data class Audio(val albumId: Int, val artist: String, val text: String, val duration: Int)
+data class AudioAttachment(override val id: Int, override val ownerId: Int, override val date: Int, val audio: Audio): Attachment{
+    override val type: String = "audio"
+}
 
-class Video(
-    id: Int,
-    ownerId: Int,
-    date: Int,
-    val description: String,
-    val title: String,
-    val duration: Int,
-    val width: Int,
-    val height: Int,
-    type: String = "Video"
-) : Attachment(type, id, ownerId, date)
+data class Video(val description: String, val title: String, val duration: Int, val width: Int, val height: Int)
+data class VideoAttachment(override val id: Int, override val ownerId: Int, override val date: Int, val video: Video): Attachment{
+    override val type: String = "video"
+}
 
-class File(
-    id: Int,
-    ownerId: Int,
-    date: Int,
-    val size: Long,
-    val title: String,
-    val ext: String,
-    type: String = "File"
-) : Attachment(type, id, ownerId, date)
+data class File(val size: Long, val title: String, val ext: String)
+data class FileAttachment( override val id: Int, override val ownerId: Int, override val date: Int, val file: File): Attachment{
+    override val type: String = "file"
+}
 
-class Url(
-    id: Int,
-    ownerId: Int,
-    date: Int,
-    val url: String,
-    val title: String,
-    val description: String,
-    type: String = "Url"
-) : Attachment(type, id, ownerId, date)
+data class Url(val url: String, val title: String, val description: String)
+data class UrlAttachment(override val id: Int, override val ownerId: Int, override val date: Int, val url: Url): Attachment{
+    override val type: String = "url"
+}
 
 object WallService {
 
@@ -126,10 +97,12 @@ object WallService {
 fun main() {
     val comments = Comments()
     val likes = Likes()
-    val video1: Attachment = Video(1, 1, 2025, "Funny", "Discovery", 1800, 1920, 1080)
-    val file1: Attachment = File(2, 1, 2023, 1024, "project", "pdf")
-    var post1 = Post(1, 2, 3, 2025, "Hello", comments, likes, video1)
-    var post2 = Post(2, 2, 3, 2026, "Hello", comments, likes, file1)
+    val video1 = Video("Funny video", "Travel", 3600, 1080, 1920)
+    val video1Attachment: Attachment = VideoAttachment(1, 1, 2025, video1)
+    val file1 = File(2048, "project", "pdf")
+    val file1Attachment: Attachment = FileAttachment(1, 2, 2020, file1)
+    var post1 = Post(1, 2, 3, 2025, "Hello", comments, likes, video1Attachment)
+    var post2 = Post(2, 2, 3, 2026, "Hello", comments, likes, file1Attachment)
     WallService.add(post1)
     println(WallService.update(post2))
 }
