@@ -40,33 +40,48 @@ interface Attachment {
 }
 
 data class Photo(val album_id: Int, val text: String, val width: Int, val height: Int)
-data class PhotoAttachment(override val id: Int, override val ownerId: Int, override val date: Int, val photo: Photo): Attachment{
+data class PhotoAttachment(override val id: Int, override val ownerId: Int, override val date: Int, val photo: Photo) :
+    Attachment {
     override val type: String = "photo"
 }
 
 data class Audio(val albumId: Int, val artist: String, val text: String, val duration: Int)
-data class AudioAttachment(override val id: Int, override val ownerId: Int, override val date: Int, val audio: Audio): Attachment{
+data class AudioAttachment(override val id: Int, override val ownerId: Int, override val date: Int, val audio: Audio) :
+    Attachment {
     override val type: String = "audio"
 }
 
 data class Video(val description: String, val title: String, val duration: Int, val width: Int, val height: Int)
-data class VideoAttachment(override val id: Int, override val ownerId: Int, override val date: Int, val video: Video): Attachment{
+data class VideoAttachment(override val id: Int, override val ownerId: Int, override val date: Int, val video: Video) :
+    Attachment {
     override val type: String = "video"
 }
 
 data class File(val size: Long, val title: String, val ext: String)
-data class FileAttachment( override val id: Int, override val ownerId: Int, override val date: Int, val file: File): Attachment{
+data class FileAttachment(override val id: Int, override val ownerId: Int, override val date: Int, val file: File) :
+    Attachment {
     override val type: String = "file"
 }
 
 data class Url(val url: String, val title: String, val description: String)
-data class UrlAttachment(override val id: Int, override val ownerId: Int, override val date: Int, val url: Url): Attachment{
+data class UrlAttachment(override val id: Int, override val ownerId: Int, override val date: Int, val url: Url) :
+    Attachment {
     override val type: String = "url"
 }
+
+class PostNotFoundException() : RuntimeException()
+
+class Comment(
+    val id: Int,
+    val from_id: Int,
+    val date: Int,
+    val text: String
+)
 
 object WallService {
 
     private var posts = emptyArray<Post>()
+    private var comments = emptyArray<Comment>()
     private var id = 0
 
     fun add(post: Post): Post {
@@ -87,6 +102,25 @@ object WallService {
         return result
     }
 
+
+    fun createComment(postId: Int, comment: Comment): Comment {
+        var result: Boolean = true
+        for ((index, postID) in posts.withIndex()) {
+            if (postID.id == postId) {
+                comments += comment
+                result = true
+                break
+            } else {
+                result = false
+            }
+        }
+        if (result) {
+            return comment
+        } else {
+            throw PostNotFoundException()
+        }
+    }
+
     fun clear() {
         posts = emptyArray()
         id = 0
@@ -97,6 +131,7 @@ object WallService {
 fun main() {
     val comments = Comments()
     val likes = Likes()
+    val comment = Comment(1, 1, 2023, "Hello netology")
     val video1 = Video("Funny video", "Travel", 3600, 1080, 1920)
     val video1Attachment: Attachment = VideoAttachment(1, 1, 2025, video1)
     val file1 = File(2048, "project", "pdf")
@@ -104,5 +139,8 @@ fun main() {
     var post1 = Post(1, 2, 3, 2025, "Hello", comments, likes, video1Attachment)
     var post2 = Post(2, 2, 3, 2026, "Hello", comments, likes, file1Attachment)
     WallService.add(post1)
+    WallService.add(post2)
+    println(WallService.createComment(3, comment))
     println(WallService.update(post2))
+
 }

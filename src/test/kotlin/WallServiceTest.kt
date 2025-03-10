@@ -47,4 +47,27 @@ class WallServiceTest {
         WallService.add(post1)
         assertEquals(WallService.update(post2), false)
     }
+
+    @Test
+    fun createComment(){
+        val comments = Comments()
+        val likes = Likes()
+        val file1 = File(2048, "project", "pdf")
+        val file1Attachment: Attachment = FileAttachment(1, 2, 2020, file1)
+        val post1 = Post(1, 2, 2, 2025, "Hello",  comments, likes, file1Attachment)
+        val comment = Comment(1, 1, 2023, "Hello netology")
+
+        assertEquals(WallService.createComment(1, comment), comment)
+    }
+
+    @Test(expected = PostNotFoundException::class)
+    fun shouldThrow() {
+        val comments = Comments()
+        val likes = Likes()
+        val file1 = File(2048, "project", "pdf")
+        val file1Attachment: Attachment = FileAttachment(1, 2, 2020, file1)
+        val post1 = Post(1, 2, 2, 2025, "Hello",  comments, likes, file1Attachment)
+        val comment = Comment(1, 1, 2023, "Hello netology")
+        WallService.createComment(1234, comment)
+    }
 }
