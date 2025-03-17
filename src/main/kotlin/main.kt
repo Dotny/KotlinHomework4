@@ -104,7 +104,7 @@ object WallService {
 
 
     fun createComment(postId: Int, comment: Comment): Comment {
-        var result: Boolean = true
+        var result: Boolean = false
         for ((index, postID) in posts.withIndex()) {
             if (postID.id == postId) {
                 comments += comment
